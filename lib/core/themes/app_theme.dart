@@ -11,18 +11,42 @@ class AppTheme {
 
   static ThemeData darkTheme = ThemeData(
     appBarTheme: AppBarTheme(
-      titleTextStyle: GoogleFonts.poppins(fontSize: 25,fontWeight: FontWeight.bold,color: Colors.white),
+      titleTextStyle: GoogleFonts.poppins(
+        fontSize: 25,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
       backgroundColor: darkBg,
     ),
-    colorScheme: ColorScheme.fromSeed(seedColor: primaryColor,surface: darkBg,primary: primaryColor),
-    elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(backgroundColor: primaryColor,shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),),textStyle: GoogleFonts.poppins(color: Colors.white))),
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: primaryColor,
+      surface: darkBg,
+      primary: primaryColor,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: primaryColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        textStyle: GoogleFonts.poppins(color: Colors.white),
+      ),
+    ),
     inputDecorationTheme: InputDecorationThemeData(
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12),borderSide: BorderSide(color: primaryColor,width: 2.6)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12),borderSide: BorderSide(color: skybluish)),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: primaryColor, width: 2.6),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: skybluish),
+      ),
       labelStyle: GoogleFonts.poppins(),
       hintStyle: GoogleFonts.poppins(),
     ),
-    
+    snackBarTheme: SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      contentTextStyle: GoogleFonts.poppins(color: Colors.white),
+    ),
   );
 }
