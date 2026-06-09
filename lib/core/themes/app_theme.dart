@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static const Color primaryColor = Color(0xffcf7751);
+  static const Color primaryColor = Color(0xFFFF007F);
   static const Color darkBg = Color(0xff121212);
   static const Color green = Color(0xff7dff95);
   static const Color goldenish = Color(0xffffbc5e);
@@ -34,14 +34,14 @@ class AppTheme {
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: primaryColor, width: 2.6),
+        borderSide: BorderSide(color: primaryColor, width: 2),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: skybluish),
       ),
-      labelStyle: GoogleFonts.poppins(),
-      hintStyle: GoogleFonts.poppins(),
+      labelStyle: GoogleFonts.poppins(color: Colors.grey),
+      hintStyle: GoogleFonts.poppins(color: Colors.grey),
     ),
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,

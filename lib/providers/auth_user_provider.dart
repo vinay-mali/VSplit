@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:vsplit/models/user_model.dart';
 import 'package:vsplit/services/auth_service.dart';
 
-class AuthProvider extends ChangeNotifier {
+class AuthUserProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
   bool _isLoading = false;
   bool get isLoading => _isLoading;
