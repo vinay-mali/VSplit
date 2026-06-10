@@ -14,7 +14,7 @@ class AuthService {
             message = "Please enter a valid email address.";
             break;
           case 'too-many-requests':
-            message = "Too many attemepts. Try again later.";
+            message = "Too many attempts. Try again later.";
             break;
           case 'email-already-in-use':
             message = "An account already exists with this email";

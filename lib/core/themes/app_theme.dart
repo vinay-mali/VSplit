@@ -43,10 +43,6 @@ class AppTheme {
       labelStyle: GoogleFonts.poppins(color: Colors.grey),
       hintStyle: GoogleFonts.poppins(color: Colors.grey),
     ),
-    snackBarTheme: SnackBarThemeData(
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      contentTextStyle: GoogleFonts.poppins(color: Colors.white),
-    ),
+    
   );
 }

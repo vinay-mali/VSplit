@@ -7,8 +7,7 @@ import 'package:vsplit/providers/auth_user_provider.dart';
 import 'package:vsplit/widgets/app_text.dart';
 
 class LoginScreen extends StatefulWidget {
-  final String mode;
-  const LoginScreen({super.key, required this.mode});
+  const LoginScreen({super.key});
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -17,20 +16,31 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailCtrl = TextEditingController();
   TextEditingController passwordCtrl = TextEditingController();
   TextEditingController usernameCtrl = TextEditingController();
+  TextEditingController fullNameCtrl = TextEditingController();
   bool obscurePassword = true;
+  String _mode = "login";
 
   void handleLogin() async {
     final authProvider = context.read<AuthUserProvider>();
     if (emailCtrl.text.trim().isEmpty || passwordCtrl.text.trim().isEmpty) {
-      snackBarMessage(context, "Please fill allthe details.");
+      snackBarMessage(context, "Please fill all the details.");
       return;
     }
-    if (widget.mode == 'signup' && usernameCtrl.text.trim().isEmpty) {
-      snackBarMessage(context, "Please enter a username.");
+    if (_mode == 'signup' &&
+        (usernameCtrl.text.trim().isEmpty ||
+            fullNameCtrl.text.trim().isEmpty)) {
+      snackBarMessage(context, "Please fill the given fields ");
       return;
+    }
+    if (_mode == 'signup') {
+      final usernameRegex = RegExp(r'^[a-zA-Z0-9_.]{3,20}$');
+      if (!usernameRegex.hasMatch(usernameCtrl.text.trim())) {
+        snackBarMessage(context, "Username: 3-20 chars, letters/numbers only");
+        return;
+      }
     }
     try {
-      if (widget.mode == 'login') {
+      if (_mode == 'login') {
         await authProvider.login(
           emailCtrl.text.trim().toLowerCase(),
           passwordCtrl.text.trim(),
@@ -40,6 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
           emailCtrl.text.trim().toLowerCase(),
           passwordCtrl.text.trim(),
           usernameCtrl.text.trim(),
+          fullNameCtrl.text.trim(),
         );
       }
     } catch (e) {
@@ -54,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.mode == 'login' ? "Login" : "Sign up"),
+          title: Text(_mode == 'login' ? "Login" : "Sign up"),
           centerTitle: true,
         ),
         body: SafeArea(
@@ -93,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ],
                         ),
                         const SizedBox(height: 10),
-                        if (widget.mode == 'signup')
+                        if (_mode == 'signup')
                           Padding(
                             padding: const EdgeInsets.only(
                               top: 13,
@@ -127,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           padding: const EdgeInsets.only(
                             left: 13,
                             right: 13,
-                            bottom: 13,
+                            bottom: 10,
                           ),
                           child: TextField(
                             obscureText: obscurePassword,
@@ -151,6 +162,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
+                        if (_mode == 'signup')
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 13),
+                            child: TextField(
+                              style: GoogleFonts.poppins(color: Colors.white),
+                              controller: fullNameCtrl,
+                              decoration: InputDecoration(
+                                labelText: "Full Name",
+                              ),
+                            ),
+                          ),
                         const SizedBox(height: 25),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 13),
@@ -173,7 +195,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     )
                                   : AppText(
-                                      text: widget.mode == 'login'
+                                      text: _mode == 'login'
                                           ? "Login"
                                           : "Sign up",
                                       textColor: Colors.white,
@@ -185,26 +207,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            if (widget.mode == 'login') {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      LoginScreen(mode: 'signup'),
-                                ),
-                              );
-                            } else {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      LoginScreen(mode: 'login'),
-                                ),
-                              );
-                            }
+                            setState(() {
+                              _mode = _mode == 'login' ? 'signup' : 'login';
+                              emailCtrl.clear();
+                              passwordCtrl.clear();
+                              usernameCtrl.clear();
+                              fullNameCtrl.clear();
+                            });
                           },
+
                           child: AppText(
-                            text: widget.mode == 'login'
+                            text: _mode == 'login'
                                 ? "Don't have an account? Create now"
                                 : "Already have an account? Login now",
                             textColor: Colors.white,

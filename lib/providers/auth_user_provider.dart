@@ -8,17 +8,31 @@ class AuthUserProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
   bool _isLoading = false;
   bool get isLoading => _isLoading;
-  Future<User?> signUp(String email, String password, String username) async {
+  Future<User?> signUp(
+    String email,
+    String password,
+    String username,
+    String fullName,
+  ) async {
     try {
       _isLoading = true;
       notifyListeners();
+
       User? user = await _authService.signUp(email, password);
       if (user != null) {
+        final usernameCheck = await FirebaseFirestore.instance
+            .collection('users')
+            .where('username', isEqualTo: username.trim().toLowerCase())
+            .get();
+        if (usernameCheck.docs.isNotEmpty) {
+          await user.delete();
+          throw "Username already taken. Try another.";
+        }
         UserModel userModel = UserModel(
           uid: user.uid,
           email: email,
-          username: username,
-          
+          username: username.trim().toLowerCase(),
+          fullName: fullName,
         );
         await FirebaseFirestore.instance
             .collection('users')
