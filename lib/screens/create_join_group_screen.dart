@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:vsplit/core/utils/helper.dart';
+import 'package:vsplit/providers/group_provider.dart';
 
 import 'package:vsplit/widgets/app_text.dart';
 
@@ -17,6 +20,32 @@ class _CreateGroupJoinScreenState extends State<CreateJoinGroupScreen> {
   void dispose() {
     nameCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> createGroup() async {
+    if (nameCtrl.text.trim().isEmpty) {
+      snackBarMessage(context, "Please enter the Group Name");
+      return;
+    }
+    try {
+      await context.read<GroupProvider>().createGroup(nameCtrl.text.trim());
+    } catch (e) {
+      snackBarMessage(context, e.toString());
+    }
+  }
+
+  Future<void> joinGroup() async {
+    if (nameCtrl.text.trim().isEmpty) {
+      snackBarMessage(context, "Please enter the code name");
+      return;
+    }
+    try {
+      await context.read<GroupProvider>().joinGroups(
+        nameCtrl.text.trim().toUpperCase(),
+      );
+    } catch (e) {
+      snackBarMessage(context, e.toString());
+    }
   }
 
   @override
@@ -53,7 +82,9 @@ class _CreateGroupJoinScreenState extends State<CreateJoinGroupScreen> {
                         Padding(
                           padding: const EdgeInsets.all(5),
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: widget.mode == 'create'
+                                ? createGroup
+                                : joinGroup,
                             child: AppText(
                               text: widget.mode == 'create' ? "Create" : "Join",
                               textColor: Colors.white,
