@@ -16,6 +16,7 @@ class AppTheme {
         fontWeight: FontWeight.bold,
         color: Colors.white,
       ),
+      iconTheme: IconThemeData(color: Colors.white,),
       backgroundColor: darkBg,
     ),
     colorScheme: ColorScheme.fromSeed(
@@ -43,6 +44,5 @@ class AppTheme {
       labelStyle: GoogleFonts.poppins(color: Colors.grey),
       hintStyle: GoogleFonts.poppins(color: Colors.grey),
     ),
-    
   );
 }

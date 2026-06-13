@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:vsplit/core/themes/app_theme.dart';
 import 'package:vsplit/screens/activity_screen.dart';
 import 'package:vsplit/screens/home_screen.dart';
@@ -34,6 +35,7 @@ class _MainScreenState extends State<MainScreen> {
         unselectedItemColor: Colors.grey,
         showUnselectedLabels: false,
         type: BottomNavigationBarType.fixed,
+        selectedLabelStyle: GoogleFonts.poppins(),
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Home"),
           BottomNavigationBarItem(

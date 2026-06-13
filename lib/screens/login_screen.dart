@@ -17,8 +17,18 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordCtrl = TextEditingController();
   TextEditingController usernameCtrl = TextEditingController();
   TextEditingController fullNameCtrl = TextEditingController();
+
   bool obscurePassword = true;
   String _mode = "login";
+
+  @override
+  void dispose() {
+    emailCtrl.dispose();
+    passwordCtrl.dispose();
+    usernameCtrl.dispose();
+    fullNameCtrl.dispose();
+    super.dispose();
+  }
 
   void handleLogin() async {
     final authProvider = context.read<AuthUserProvider>();
