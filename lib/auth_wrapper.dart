@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:vsplit/screens/login_screen.dart';
-import 'package:vsplit/screens/main_screen.dart';
-import 'package:vsplit/screens/splash_screen.dart';
+import 'package:vsplit/screens/auth/splash_screen.dart';
+import 'package:vsplit/screens/auth/login_screen.dart';
+import 'package:vsplit/screens/auth/main_screen.dart';
 import 'package:vsplit/widgets/app_text.dart';
 
 class AuthWrapper extends StatefulWidget {
@@ -13,8 +13,19 @@ class AuthWrapper extends StatefulWidget {
 }
 
 class _AuthWrapperState extends State<AuthWrapper> {
+  bool _showSplash = true;
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _showSplash = false);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_showSplash) return SplashScreen();
+
     return StreamBuilder(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {

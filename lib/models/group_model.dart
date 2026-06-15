@@ -8,6 +8,8 @@ class GroupModel {
   final String adminUid;
   final DateTime? createdAt;
   final List<String> members;
+  final String? currency;
+  final String? description;
 
   GroupModel({
     required this.groupID,
@@ -17,6 +19,8 @@ class GroupModel {
     required this.adminUid,
     this.createdAt,
     required this.members,
+    this.currency,
+    this.description,
   });
 
   factory GroupModel.fromMap(Map<String, dynamic> json) {
@@ -28,6 +32,8 @@ class GroupModel {
       adminUid: json['adminUid'],
       createdAt: (json['createdAt'] as Timestamp?)?.toDate(),
       members: List<String>.from(json['members'] ?? []),
+      currency: json['currency'] ?? "",
+      description: json['description'] ?? "",
     );
   }
 
@@ -40,6 +46,8 @@ class GroupModel {
       'adminUid': adminUid,
       'createdAt': FieldValue.serverTimestamp(),
       'members': members,
+      'currency': currency,
+      'description': description,
     };
   }
 }

@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppText extends StatelessWidget {
-  const AppText({super.key, required this.text,this.textFontSize,this.textFontWeight, this.textColor});
+  const AppText({
+    super.key,
+    required this.text,
+    this.textFontSize,
+    this.textFontWeight,
+    this.textColor = Colors.white,
+  });
 
   final String text;
   final double? textFontSize;
@@ -10,10 +16,13 @@ class AppText extends StatelessWidget {
   final Color? textColor;
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: GoogleFonts.poppins(
-      fontSize: textFontSize,
-      fontWeight: textFontWeight,
-      color: textColor,
-    ));
+    return Text(
+      text,
+      style: GoogleFonts.poppins(
+        fontSize: textFontSize,
+        fontWeight: textFontWeight,
+        color: textColor,
+      ),
+    );
   }
 }

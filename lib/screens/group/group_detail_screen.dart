@@ -1,0 +1,179 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:vsplit/core/themes/app_theme.dart';
+import 'package:vsplit/core/utils/helper.dart';
+import 'package:vsplit/models/group_model.dart';
+import 'package:vsplit/providers/group_provider.dart';
+import 'package:vsplit/screens/expence/add_expence_screen.dart';
+import 'package:vsplit/widgets/app_text.dart';
+
+class GroupDetailScreen extends StatefulWidget {
+  final GroupModel group;
+  const GroupDetailScreen({super.key, required this.group});
+  @override
+  State<GroupDetailScreen> createState() => _GroupDetailScreenState();
+}
+
+class _GroupDetailScreenState extends State<GroupDetailScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.group.name),
+        actions: [
+          PopupMenuButton<String>(
+            color: const Color.fromARGB(255, 63, 61, 61),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(13),
+            ),
+
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem<String>(
+                  value: "delete_group",
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            63,
+                            61,
+                            61,
+                          ),
+                          title: AppText(
+                            text: "Are you sure to delete this group?",
+                            textFontSize: 17,
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: AppText(text: "Cancel"),
+                            ),
+
+                            ElevatedButton(
+                              onPressed:
+                                  context.watch<GroupProvider>().isDeleting
+                                  ? null
+                                  : () async {
+                                      try {
+                                        await context
+                                            .read<GroupProvider>()
+                                            .deleteGroup(widget.group.groupID);
+                                        if (!mounted) return;
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                      } catch (e) {
+                                        snackBarMessage(context, e.toString());
+                                      }
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                              ),
+                              child: context.watch<GroupProvider>().isDeleting
+                                  ? SizedBox(
+                                      width: 15,
+                                      height: 15,
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    )
+                                  : AppText(text: "Delete"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: AppText(text: "Delete Group", textColor: Colors.white),
+                ),
+              ];
+            },
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(14.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.group.description != null &&
+                      widget.group.description != "")
+                    AppText(
+                      text: "Description: ${widget.group.description}",
+                      textFontSize: 16,
+                    ),
+                  if (widget.group.currency != null &&
+                      widget.group.currency != "")
+                    AppText(text: "Currency: ${widget.group.currency}"),
+                  AppText(
+                    text: "Group Creator: ${widget.group.createdBy}",
+                    textFontSize: 16,
+                  ),
+
+                  AppText(
+                    text:
+                        "Created on ${DateFormat('dd MMM yyyy , hh:mm a').format(widget.group.createdAt!)}",
+                    textFontSize: 16,
+                    textColor: Colors.grey,
+                  ),
+                  AppText(
+                    text: "Join code: ${widget.group.joinCode}",
+                    textColor: AppTheme.green,
+                    textFontSize: 16,
+                  ),
+                  SizedBox(height: 18),
+                  AppText(text: "Members: "),
+                  Wrap(
+                    children: widget.group.members.map((uid) {
+                      return FutureBuilder(
+                        future: context.read<GroupProvider>().getUserById(uid),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                          if (!snapshot.hasData) {
+                            return AppText(text: "");
+                          }
+                          return AppText(
+                            text: "${snapshot.data!.fullName}, ",
+                            textFontSize: 16,
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: AppTheme.primaryColor,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddExpenceScreen()),
+          );
+        },
+        icon: Icon(Icons.add, color: Colors.white),
+        label: AppText(
+          text: "Add Expence",
+          textFontSize: 16,
+          textFontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+}
