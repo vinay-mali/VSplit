@@ -6,7 +6,7 @@ import 'package:vsplit/core/themes/app_theme.dart';
 import 'package:vsplit/core/utils/helper.dart';
 import 'package:vsplit/models/group_model.dart';
 import 'package:vsplit/providers/group_provider.dart';
-import 'package:vsplit/screens/expence/add_expence_screen.dart';
+import 'package:vsplit/screens/expence/add_expense_screen.dart';
 import 'package:vsplit/widgets/app_text.dart';
 
 class GroupDetailScreen extends StatefulWidget {
@@ -249,12 +249,12 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddExpenceScreen()),
+            MaterialPageRoute(builder: (context) => AddExpenseScreen(group: widget.group,)),
           );
         },
         icon: Icon(Icons.add, color: Colors.white),
         label: AppText(
-          text: "Add Expence",
+          text: "Add Expense",
           textFontSize: 16,
           textFontWeight: FontWeight.w500,
         ),

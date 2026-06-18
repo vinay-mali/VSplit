@@ -5,7 +5,7 @@ import 'package:vsplit/auth_wrapper.dart';
 import 'package:vsplit/core/themes/app_theme.dart';
 import 'package:vsplit/firebase_options.dart';
 import 'package:vsplit/providers/auth_user_provider.dart';
-import 'package:vsplit/providers/expence_provider.dart';
+import 'package:vsplit/providers/expense_provider.dart';
 import 'package:vsplit/providers/group_provider.dart';
 
 void main() async {
@@ -16,7 +16,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthUserProvider()),
         ChangeNotifierProvider(create: (_) => GroupProvider()),
-        ChangeNotifierProvider(create: (_) => ExpenceProvider()),
+        ChangeNotifierProvider(create: (_) => ExpenseProvider()),
       ],
       child: const MyApp(),
     ),
