@@ -4,10 +4,13 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:vsplit/core/themes/app_theme.dart';
 import 'package:vsplit/core/utils/helper.dart';
+import 'package:vsplit/models/expense_model.dart';
 import 'package:vsplit/models/group_model.dart';
+import 'package:vsplit/providers/expense_provider.dart';
 import 'package:vsplit/providers/group_provider.dart';
 import 'package:vsplit/screens/expence/add_expense_screen.dart';
 import 'package:vsplit/widgets/app_text.dart';
+import 'package:vsplit/widgets/expense_card.dart';
 
 class GroupDetailScreen extends StatefulWidget {
   final GroupModel group;
@@ -17,6 +20,16 @@ class GroupDetailScreen extends StatefulWidget {
 }
 
 class _GroupDetailScreenState extends State<GroupDetailScreen> {
+  late Stream _expenseStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _expenseStream = context.read<ExpenseProvider>().getExpenses(
+      widget.group.groupID,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +41,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadiusGeometry.circular(13),
             ),
-
             itemBuilder: (BuildContext context) {
               return [
                 if (widget.group.adminUid ==
@@ -52,12 +64,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                             ),
                             actions: [
                               TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
+                                onPressed: () => Navigator.pop(context),
                                 child: AppText(text: "Cancel"),
                               ),
-
                               ElevatedButton(
                                 onPressed:
                                     context.watch<GroupProvider>().isDeleting
@@ -86,10 +95,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                     ? SizedBox(
                                         width: 15,
                                         height: 15,
-                                        child: Center(
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                          ),
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
                                         ),
                                       )
                                     : AppText(text: "Delete"),
@@ -126,12 +133,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                             ),
                             actions: [
                               TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
+                                onPressed: () => Navigator.pop(context),
                                 child: AppText(text: "Cancel"),
                               ),
-
                               ElevatedButton(
                                 onPressed:
                                     context.watch<GroupProvider>().isRemoving
@@ -160,10 +164,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                     ? SizedBox(
                                         width: 15,
                                         height: 15,
-                                        child: Center(
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                          ),
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
                                         ),
                                       )
                                     : AppText(text: "Remove"),
@@ -185,6 +187,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
       ),
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.all(14.0),
@@ -204,7 +207,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                     text: "Group Creator: ${widget.group.createdBy}",
                     textFontSize: 16,
                   ),
-
                   AppText(
                     text:
                         "Created on ${DateFormat('dd MMM yyyy , hh:mm a').format(widget.group.createdAt!)}",
@@ -225,11 +227,13 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
+                            return SizedBox(
+                              width: 15,
+                              height: 15,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            );
                           }
-                          if (!snapshot.hasData) {
-                            return AppText(text: "");
-                          }
+                          if (!snapshot.hasData) return AppText(text: "");
                           return AppText(
                             text: "${snapshot.data!.fullName}, ",
                             textFontSize: 16,
@@ -241,6 +245,34 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                 ],
               ),
             ),
+            Expanded(
+              child: StreamBuilder(
+                stream: _expenseStream,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: AppText(text: "Something went wrong"));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(child: AppText(text: "No Expenses yet."));
+                  }
+                  return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      final expense = ExpenseModel.fromMap(
+                        snapshot.data!.docs[index].data()
+                            as Map<String, dynamic>,
+                      );
+                      return ExpenseCard(expense: expense, group: widget.group);
+                    },
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -249,7 +281,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddExpenseScreen(group: widget.group,)),
+            MaterialPageRoute(
+              builder: (context) => AddExpenseScreen(group: widget.group),
+            ),
           );
         },
         icon: Icon(Icons.add, color: Colors.white),

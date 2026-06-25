@@ -42,4 +42,23 @@ class ExpenseProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+  bool _deletingExpense = false;
+bool get deletingExpense => _deletingExpense;
+
+Stream<QuerySnapshot> getExpenses(String groupId) {
+  return _expenseService.getExpenses(groupId);
+}
+
+Future<void> deleteExpense(String groupId, String expenseId) async {
+  try {
+    _deletingExpense = true;
+    notifyListeners();
+    await _expenseService.deleteExpense(groupId, expenseId);
+  } catch (e) {
+    rethrow;
+  } finally {
+    _deletingExpense = false;
+    notifyListeners();
+  }
+}
 }
