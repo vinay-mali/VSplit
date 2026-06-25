@@ -83,7 +83,7 @@ class _CreateGroupJoinScreenState extends State<CreateJoinGroupScreen> {
                             vertical: 5,
                           ),
                           child: TextField(
-                            style: GoogleFonts.poppins(color: Colors.white),
+                            style: GoogleFonts.poppins(color: Colors.white,),
                             controller: nameCtrl,
                             decoration: InputDecoration(
                               labelText: widget.mode == 'create'

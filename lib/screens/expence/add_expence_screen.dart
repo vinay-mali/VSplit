@@ -9,6 +9,13 @@ class AddExpenceScreen extends StatefulWidget {
 class _AddExpenceScreenState extends State<AddExpenceScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: Text("Add Expence")));
+    return Scaffold(
+      appBar: AppBar(title: Text("Add Expence")),
+      body: SafeArea(child: Column(
+        children: [
+          
+        ],
+      )),
+      );
   }
 }

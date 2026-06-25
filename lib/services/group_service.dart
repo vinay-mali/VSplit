@@ -92,4 +92,21 @@ class GroupService {
       throw "Unable to delete group. Try again.";
     }
   }
+
+  Future<void> removeGroup(String groupID) async {
+    try {
+      final currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+      final group = await FirebaseFirestore.instance
+          .collection('groups')
+          .doc(groupID)
+          .get();
+      if (group.exists) {
+        await group.reference.update({
+          "members": FieldValue.arrayRemove([currentUserUid]),
+        });
+      }
+    } catch (e) {
+      throw "Unable to remove group";
+    }
+  }
 }

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -30,69 +31,153 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
 
             itemBuilder: (BuildContext context) {
               return [
-                PopupMenuItem<String>(
-                  value: "delete_group",
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          backgroundColor: const Color.fromARGB(
-                            255,
-                            63,
-                            61,
-                            61,
-                          ),
-                          title: AppText(
-                            text: "Are you sure to delete this group?",
-                            textFontSize: 17,
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: AppText(text: "Cancel"),
+                if (widget.group.adminUid ==
+                    FirebaseAuth.instance.currentUser!.uid)
+                  PopupMenuItem<String>(
+                    value: "delete_group",
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            backgroundColor: const Color.fromARGB(
+                              255,
+                              63,
+                              61,
+                              61,
                             ),
-
-                            ElevatedButton(
-                              onPressed:
-                                  context.watch<GroupProvider>().isDeleting
-                                  ? null
-                                  : () async {
-                                      try {
-                                        await context
-                                            .read<GroupProvider>()
-                                            .deleteGroup(widget.group.groupID);
-                                        if (!mounted) return;
-                                        Navigator.pop(context);
-                                        Navigator.pop(context);
-                                      } catch (e) {
-                                        snackBarMessage(context, e.toString());
-                                      }
-                                    },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
+                            title: AppText(
+                              text: "Are you sure to delete this group?",
+                              textFontSize: 17,
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: AppText(text: "Cancel"),
                               ),
-                              child: context.watch<GroupProvider>().isDeleting
-                                  ? SizedBox(
-                                      width: 15,
-                                      height: 15,
-                                      child: Center(
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
+
+                              ElevatedButton(
+                                onPressed:
+                                    context.watch<GroupProvider>().isDeleting
+                                    ? null
+                                    : () async {
+                                        try {
+                                          await context
+                                              .read<GroupProvider>()
+                                              .deleteGroup(
+                                                widget.group.groupID,
+                                              );
+                                          if (!mounted) return;
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        } catch (e) {
+                                          snackBarMessage(
+                                            context,
+                                            e.toString(),
+                                          );
+                                        }
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                ),
+                                child: context.watch<GroupProvider>().isDeleting
+                                    ? SizedBox(
+                                        width: 15,
+                                        height: 15,
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ),
                                         ),
-                                      ),
-                                    )
-                                  : AppText(text: "Delete"),
+                                      )
+                                    : AppText(text: "Delete"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: AppText(
+                      text: "Delete Group",
+                      textColor: Colors.white,
+                    ),
+                  ),
+                if (widget.group.adminUid !=
+                    FirebaseAuth.instance.currentUser!.uid)
+                  PopupMenuItem<String>(
+                    value: "remove_group",
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            backgroundColor: const Color.fromARGB(
+                              255,
+                              63,
+                              61,
+                              61,
                             ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  child: AppText(text: "Delete Group", textColor: Colors.white),
-                ),
+                            title: AppText(
+                              text:
+                                  "Are you sure you want to leave this group?",
+                              textFontSize: 17,
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: AppText(text: "Cancel"),
+                              ),
+
+                              ElevatedButton(
+                                onPressed:
+                                    context.watch<GroupProvider>().isRemoving
+                                    ? null
+                                    : () async {
+                                        try {
+                                          await context
+                                              .read<GroupProvider>()
+                                              .removeGroup(
+                                                widget.group.groupID,
+                                              );
+                                          if (!mounted) return;
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        } catch (e) {
+                                          snackBarMessage(
+                                            context,
+                                            e.toString(),
+                                          );
+                                        }
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                ),
+                                child: context.watch<GroupProvider>().isRemoving
+                                    ? SizedBox(
+                                        width: 15,
+                                        height: 15,
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      )
+                                    : AppText(text: "Remove"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: AppText(
+                      text: "Leave Group",
+                      textColor: Colors.white,
+                    ),
+                  ),
               ];
             },
           ),

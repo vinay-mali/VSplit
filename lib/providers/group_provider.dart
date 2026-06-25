@@ -9,15 +9,23 @@ class GroupProvider extends ChangeNotifier {
   final GroupService _groupService = GroupService();
   bool _isDeleting = false;
   bool get isDeleting => _isDeleting;
+  bool _isRemoving = false;
+  bool get isRemoving => _isRemoving;
   bool _isCreating = false;
   bool get isCreating => _isCreating;
+  bool _isJoining = false;
+  bool get isJoining => _isJoining;
 
   Future<String> generateJoinCode() async {
     final result = await _groupService.generateJoinCode();
     return result;
   }
 
-  Future<void> createGroup(String groupName,String currency, String description) async {
+  Future<void> createGroup(
+    String groupName,
+    String currency,
+    String description,
+  ) async {
     try {
       _isCreating = true;
       notifyListeners();
@@ -38,7 +46,6 @@ class GroupProvider extends ChangeNotifier {
         members: [currentUserUid],
         currency: currency,
         description: description,
-
       );
       await _groupService.createGroup(groupModel);
     } catch (e) {
@@ -51,9 +58,14 @@ class GroupProvider extends ChangeNotifier {
 
   Future<void> joinGroups(String joinCode) async {
     try {
+      _isJoining = true;
+      notifyListeners();
       await _groupService.joinGroups(joinCode);
     } catch (e) {
       rethrow;
+    } finally {
+      _isJoining = false;
+      notifyListeners();
     }
   }
 
@@ -79,6 +91,19 @@ class GroupProvider extends ChangeNotifier {
       rethrow;
     } finally {
       _isDeleting = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> removeGroup(String groupID) async {
+    try {
+      _isRemoving = true;
+      notifyListeners();
+      await _groupService.removeGroup(groupID);
+    } catch (e) {
+      rethrow;
+    } finally {
+      _isRemoving = false;
       notifyListeners();
     }
   }
