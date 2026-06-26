@@ -151,7 +151,9 @@ class _CreateGroupJoinScreenState extends State<CreateJoinGroupScreen> {
                         Padding(
                           padding: const EdgeInsets.all(5),
                           child: ElevatedButton(
-                            onPressed: context.watch<GroupProvider>().isCreating
+                            onPressed:
+                                context.watch<GroupProvider>().isCreating ||
+                                    context.watch<GroupProvider>().isJoining
                                 ? null
                                 : widget.mode == 'create'
                                 ? createGroup

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -20,7 +21,7 @@ class GroupDetailScreen extends StatefulWidget {
 }
 
 class _GroupDetailScreenState extends State<GroupDetailScreen> {
-  late Stream _expenseStream;
+  late Stream<QuerySnapshot> _expenseStream;
 
   @override
   void initState() {
@@ -186,92 +187,100 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         ],
       ),
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(14.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (widget.group.description != null &&
-                      widget.group.description != "")
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(14.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (widget.group.description != null &&
+                        widget.group.description != "")
+                      AppText(
+                        text: "Description: ${widget.group.description}",
+                        textFontSize: 16,
+                      ),
+                    if (widget.group.currency != null &&
+                        widget.group.currency != "")
+                      AppText(text: "Currency: ${widget.group.currency}"),
                     AppText(
-                      text: "Description: ${widget.group.description}",
+                      text: "Group Creator: ${widget.group.createdBy}",
                       textFontSize: 16,
                     ),
-                  if (widget.group.currency != null &&
-                      widget.group.currency != "")
-                    AppText(text: "Currency: ${widget.group.currency}"),
-                  AppText(
-                    text: "Group Creator: ${widget.group.createdBy}",
-                    textFontSize: 16,
-                  ),
-                  AppText(
-                    text:
-                        "Created on ${DateFormat('dd MMM yyyy , hh:mm a').format(widget.group.createdAt!)}",
-                    textFontSize: 16,
-                    textColor: Colors.grey,
-                  ),
-                  AppText(
-                    text: "Join code: ${widget.group.joinCode}",
-                    textColor: AppTheme.green,
-                    textFontSize: 16,
-                  ),
-                  SizedBox(height: 18),
-                  AppText(text: "Members: "),
-                  Wrap(
-                    children: widget.group.members.map((uid) {
-                      return FutureBuilder(
-                        future: context.read<GroupProvider>().getUserById(uid),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return SizedBox(
-                              width: 15,
-                              height: 15,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                    AppText(
+                      text:
+                          "Created on ${DateFormat('dd MMM yyyy , hh:mm a').format(widget.group.createdAt!)}",
+                      textFontSize: 16,
+                      textColor: Colors.grey,
+                    ),
+                    AppText(
+                      text: "Join code: ${widget.group.joinCode}",
+                      textColor: AppTheme.green,
+                      textFontSize: 16,
+                    ),
+                    SizedBox(height: 18),
+                    AppText(text: "Members: "),
+                    Wrap(
+                      children: widget.group.members.map((uid) {
+                        return FutureBuilder(
+                          future: context.read<GroupProvider>().getUserById(
+                            uid,
+                          ),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return SizedBox(
+                                width: 15,
+                                height: 15,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              );
+                            }
+                            if (!snapshot.hasData) return AppText(text: "");
+                            return AppText(
+                              text: "${snapshot.data!.fullName}, ",
+                              textFontSize: 16,
                             );
-                          }
-                          if (!snapshot.hasData) return AppText(text: "");
-                          return AppText(
-                            text: "${snapshot.data!.fullName}, ",
-                            textFontSize: 16,
-                          );
-                        },
-                      );
-                    }).toList(),
-                  ),
-                ],
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
               ),
             ),
-            Expanded(
-              child: StreamBuilder(
-                stream: _expenseStream,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
+
+            StreamBuilder(
+              stream: _expenseStream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return SliverToBoxAdapter(
+                    child: Center(
                       child: CircularProgressIndicator(color: Colors.white),
-                    );
-                  }
-                  if (snapshot.hasError) {
-                    return Center(child: AppText(text: "Something went wrong"));
-                  }
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return Center(child: AppText(text: "No Expenses yet."));
-                  }
-                  return ListView.builder(
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      final expense = ExpenseModel.fromMap(
-                        snapshot.data!.docs[index].data()
-                            as Map<String, dynamic>,
-                      );
-                      return ExpenseCard(expense: expense, group: widget.group);
-                    },
+                    ),
                   );
-                },
-              ),
+                }
+                if (snapshot.hasError) {
+                  return SliverToBoxAdapter(
+                    child: Center(child: AppText(text: "Something went wrong")),
+                  );
+                }
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return SliverToBoxAdapter(
+                    child: Center(child: AppText(text: "No Expenses yet.")),
+                  );
+                }
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final expense = ExpenseModel.fromMap(
+                      snapshot.data!.docs[index].data() as Map<String, dynamic>,
+                    );
+                    return ExpenseCard(expense: expense, group: widget.group);
+                  }, childCount: snapshot.data!.docs.length),
+                );
+              },
             ),
           ],
         ),

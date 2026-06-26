@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:vsplit/core/themes/app_theme.dart';
 import 'package:vsplit/core/utils/helper.dart';
 import 'package:vsplit/models/expense_model.dart';
 import 'package:vsplit/models/group_model.dart';
@@ -88,9 +89,15 @@ class _ExpenseCardState extends State<ExpenseCard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    AppText(text: widget.expense.name, textFontSize: 16),
                     AppText(
-                      text: widget.expense.amount.toString(),
+                      text: widget.expense.name,
+                      textFontSize: 16,
+                      textFontWeight: FontWeight.w500,
+                      textColor: AppTheme.goldenish,
+                    ),
+                    AppText(
+                      text:
+                          "${widget.group.currency} ${widget.expense.amount.toString()}",
                       textFontSize: 17,
                       textFontWeight: FontWeight.w600,
                     ),
