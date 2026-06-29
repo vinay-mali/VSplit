@@ -15,3 +15,11 @@ void snackBarMessage(BuildContext context, String content) {
     ),
   );
 }
+
+String convertAmount(double amount) {
+  if (amount == amount.truncate()) {
+    return amount.toInt().toString();
+  } else {
+    return amount.toStringAsFixed(2);
+  }
+}

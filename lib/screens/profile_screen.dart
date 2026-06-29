@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -61,16 +59,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.all(14.0),
-                        child: AppText(
-                          text:
-                              "Account created on: ${DateFormat('yyyy-MM-dd').format(_user!.dateCreated!)}",
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: AppText(
+                        text:
+                            "Account created on: ${DateFormat('yyyy-MM-dd').format(_user!.dateCreated!)}",
                       ),
                     ),
+
                     SizedBox(height: 30),
                     ElevatedButton(
                       onPressed: () async {

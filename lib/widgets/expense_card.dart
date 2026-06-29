@@ -18,13 +18,28 @@ class ExpenseCard extends StatefulWidget {
 }
 
 class _ExpenseCardState extends State<ExpenseCard> {
-  Future<List<String>> _getSplitNames() async {
+  String? _paidByName;
+  List<String> _splitNames = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNames();
+  }
+
+  Future<void> _loadNames() async {
+    final paidByUser = await context.read<GroupProvider>().getUserById(
+      widget.expense.paidBy,
+    );
     List<String> names = [];
     for (final uid in widget.expense.splitBetween) {
       final user = await context.read<GroupProvider>().getUserById(uid);
       names.add(user.fullName);
     }
-    return names;
+    setState(() {
+      _paidByName = paidByUser.fullName;
+      _splitNames = names;
+    });
   }
 
   @override
@@ -106,36 +121,22 @@ class _ExpenseCardState extends State<ExpenseCard> {
                 Row(
                   children: [
                     AppText(text: "Paid by: "),
-                    FutureBuilder(
-                      future: context.read<GroupProvider>().getUserById(
-                        widget.expense.paidBy,
-                      ),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) return AppText(text: "...");
-                        return AppText(
-                          text: snapshot.data!.fullName,
-                          textFontWeight: FontWeight.w500,
-                        );
-                      },
+                    AppText(
+                      text: _paidByName ?? "...",
+                      textFontWeight: FontWeight.w500,
                     ),
                   ],
                 ),
                 AppText(
                   text:
-                      "Per person: ${widget.expense.perPersonAmount.toStringAsFixed(2)}",
+                      "Per person:  ${widget.group.currency} ${convertAmount(widget.expense.perPersonAmount)}",
                   textFontSize: 16,
                   textFontWeight: FontWeight.w600,
                 ),
-                FutureBuilder<List<String>>(
-                  future: _getSplitNames(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) return AppText(text: "Loading...");
-                    return AppText(
-                      text: "Split: ${snapshot.data!.join(', ')}",
-                      textFontSize: 14,
-                      textColor: Colors.grey,
-                    );
-                  },
+                AppText(
+                  text: "Split: ${_splitNames.join(', ')}",
+                  textFontSize: 14,
+                  textColor: Colors.grey,
                 ),
               ],
             ),

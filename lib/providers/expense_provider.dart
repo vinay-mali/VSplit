@@ -34,7 +34,6 @@ class ExpenseProvider extends ChangeNotifier {
         perPersonAmount: perPersonAmount,
       );
       await _expenseService.addExpence(expenseModel, groupId);
-      
     } catch (e) {
       rethrow;
     } finally {
@@ -42,23 +41,35 @@ class ExpenseProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   bool _deletingExpense = false;
-bool get deletingExpense => _deletingExpense;
+  bool get deletingExpense => _deletingExpense;
 
-Stream<QuerySnapshot> getExpenses(String groupId) {
-  return _expenseService.getExpenses(groupId);
-}
-
-Future<void> deleteExpense(String groupId, String expenseId) async {
-  try {
-    _deletingExpense = true;
-    notifyListeners();
-    await _expenseService.deleteExpense(groupId, expenseId);
-  } catch (e) {
-    rethrow;
-  } finally {
-    _deletingExpense = false;
-    notifyListeners();
+  Stream<QuerySnapshot> getExpenses(String groupId) {
+    return _expenseService.getExpenses(groupId);
   }
-}
+
+  Future<void> deleteExpense(String groupId, String expenseId) async {
+    try {
+      _deletingExpense = true;
+      notifyListeners();
+      await _expenseService.deleteExpense(groupId, expenseId);
+    } catch (e) {
+      rethrow;
+    } finally {
+      _deletingExpense = false;
+      notifyListeners();
+    }
+  }
+
+  Future<Map<String, double>> getExpenseSummary(
+    String groupId,
+    String currentUserUid,
+  ) async {
+    try {
+      return await _expenseService.getExpenseSummary(groupId, currentUserUid);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

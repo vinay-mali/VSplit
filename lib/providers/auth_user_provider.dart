@@ -3,9 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:vsplit/models/user_model.dart';
 import 'package:vsplit/services/auth_service.dart';
+import 'package:vsplit/services/user_service.dart';
 
 class AuthUserProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
+  final UserService _userService = UserService();
+
+  late UserModel _userModel;
+  UserModel get getUserModel => _userModel;
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
   Future<User?> signUp(
@@ -66,6 +72,14 @@ class AuthUserProvider extends ChangeNotifier {
   Future<void> signOut() async {
     try {
       await _authService.signOut();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> fetchCurrentUser() async {
+    try {
+      _userModel = await _userService.fetchCurrentUser();
     } catch (e) {
       rethrow;
     }

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:vsplit/core/themes/app_theme.dart';
 import 'package:vsplit/models/group_model.dart';
+import 'package:vsplit/providers/auth_user_provider.dart';
 import 'package:vsplit/providers/group_provider.dart';
 import 'package:vsplit/screens/group/create_join_group_screen.dart';
 import 'package:vsplit/screens/group/group_detail_screen.dart';
@@ -23,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    context.read<AuthUserProvider>().fetchCurrentUser();
     _groupStream = context.read<GroupProvider>().getGroups();
   }
 

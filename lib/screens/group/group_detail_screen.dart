@@ -7,11 +7,13 @@ import 'package:vsplit/core/themes/app_theme.dart';
 import 'package:vsplit/core/utils/helper.dart';
 import 'package:vsplit/models/expense_model.dart';
 import 'package:vsplit/models/group_model.dart';
+import 'package:vsplit/models/user_model.dart';
 import 'package:vsplit/providers/expense_provider.dart';
 import 'package:vsplit/providers/group_provider.dart';
 import 'package:vsplit/screens/expence/add_expense_screen.dart';
 import 'package:vsplit/widgets/app_text.dart';
 import 'package:vsplit/widgets/expense_card.dart';
+import 'package:vsplit/widgets/total_expense.dart';
 
 class GroupDetailScreen extends StatefulWidget {
   final GroupModel group;
@@ -22,6 +24,7 @@ class GroupDetailScreen extends StatefulWidget {
 
 class _GroupDetailScreenState extends State<GroupDetailScreen> {
   late Stream<QuerySnapshot> _expenseStream;
+  List<UserModel> _members = [];
 
   @override
   void initState() {
@@ -29,6 +32,16 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     _expenseStream = context.read<ExpenseProvider>().getExpenses(
       widget.group.groupID,
     );
+    loadMembers();
+  }
+
+  Future<void> loadMembers() async {
+    List<UserModel> loaded = [];
+    for (final uid in widget.group.members) {
+      final user = await context.read<GroupProvider>().getUserById(uid);
+      loaded.add(user);
+    }
+    setState(() => _members = loaded);
   }
 
   @override
@@ -201,6 +214,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                         text: "Description: ${widget.group.description}",
                         textFontSize: 16,
                       ),
+                    SizedBox(height: 15),
                     if (widget.group.currency != null &&
                         widget.group.currency != "")
                       AppText(text: "Currency: ${widget.group.currency}"),
@@ -220,32 +234,33 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                       textFontSize: 16,
                     ),
                     SizedBox(height: 18),
+                    if (_members.isEmpty)
+                      SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(),
+                      ),
+
                     AppText(text: "Members: "),
                     Wrap(
-                      children: widget.group.members.map((uid) {
-                        return FutureBuilder(
-                          future: context.read<GroupProvider>().getUserById(
-                            uid,
-                          ),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return SizedBox(
-                                width: 15,
-                                height: 15,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              );
-                            }
-                            if (!snapshot.hasData) return AppText(text: "");
-                            return AppText(
-                              text: "${snapshot.data!.fullName}, ",
-                              textFontSize: 16,
-                            );
-                          },
+                      children: _members.map((user) {
+                        return AppText(
+                          text: user == _members.last
+                              ? user.fullName
+                              : "${(user.fullName)}, ",
+                          textFontSize: 16,
                         );
                       }).toList(),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 18,
+                        left: 5,
+                        bottom: 5,
+                        right: 5,
+                      ),
+                      child: TotalExpense(group: widget.group),
                     ),
                   ],
                 ),
@@ -277,7 +292,11 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                     final expense = ExpenseModel.fromMap(
                       snapshot.data!.docs[index].data() as Map<String, dynamic>,
                     );
-                    return ExpenseCard(expense: expense, group: widget.group);
+                    return ExpenseCard(
+                      expense: expense,
+                      group: widget.group,
+                      key: ValueKey(expense.expenseId),
+                    );
                   }, childCount: snapshot.data!.docs.length),
                 );
               },
